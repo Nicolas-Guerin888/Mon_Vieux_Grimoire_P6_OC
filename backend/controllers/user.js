@@ -5,6 +5,8 @@ const jwt = require('jsonwebtoken')
 
 // Fonction pour l'inscription d'un utilisateur
 exports.signup = (req, res, next) => {
+    console.log('Email:', req.body.email)
+    console.log('Password:', req.body.password)
     // Hachage du mot de passe avec 10 passages
     bcrypt.hash(req.body.password, 10)
         .then(hash => {
@@ -24,6 +26,8 @@ exports.signup = (req, res, next) => {
 
 // Fonction pour la connexion d'un utilisateur
 exports.login = (req, res, next) => {
+    console.log('Email:', req.body.email)
+    console.log('Password:', req.body.password)
     // Recherche de l'utilisateur par email
     User.findOne({ email: req.body.email })
         .then(user => {

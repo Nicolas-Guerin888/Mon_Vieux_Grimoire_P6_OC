@@ -7,6 +7,7 @@ const path = require('path') // Importation du module path pour gérer les chemi
 // Création de l'application Express
 const app = express()
 
+
 // Connexion à MongoDB
 mongoose.connect('mongodb+srv://NicolasAdminTest:kmxpSg8KaR9FYD2G@cluster0.takpkux.mongodb.net/?retryWrites=true&w=majority&appName=Cluster0') // URL MongoDB
     .then(() => console.log('Connexion à MongoDB réussie !')) // Message de succès si la connexion fonctionne
@@ -20,8 +21,11 @@ app.use((req, res, next) => {
     next()
 })
 
+app.use(express.json())
+app.use(express.urlencoded({ extended: true }))
+
 // Définition des routes
-app.use('/api/stuff', stuffRoutes) // Utilise les routes définies dans stuffRoutes pour les requêtes vers /api/stuff
+app.use('/api/books', stuffRoutes) // Utilise les routes définies dans stuffRoutes pour les requêtes vers /api/stuff
 app.use('/api/auth', userRoutes) // Utilise les routes définies dans userRoutes pour les requêtes vers /api/auth
 
 // Gestion des fichiers statiques

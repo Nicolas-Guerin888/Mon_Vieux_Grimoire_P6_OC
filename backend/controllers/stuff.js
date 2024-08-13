@@ -1,4 +1,4 @@
-const Thing = require('../models/Thing')
+const Book = require('../models/Book')
 const fs = require('fs') // Importation du module fs pour gérer les fichiers
 
 /* const mongoose = require('mongoose');
@@ -7,53 +7,53 @@ console.log(id); // Cela générera un nouvel ObjectId */
 
 
 
-// Requête GET qui récupère toute la liste de Things
-exports.getAllStuff = (req, res, next) => {
+// Requête GET qui récupère toute la liste de Books
+exports.getAllBooks = (req, res, next) => {
     console.log('Requête GET ALL reçue !')
-    Thing.find() // Recherche de tous les objets Thing dans la base de données
-        .then(things => res.status(200).json(things))
+    Book.find() // Recherche de tous les objets Book dans la base de données
+        .then(books => res.status(200).json(books))
         .catch(error => res.status(400).json({ error }))
 }
 
-// Requête GET qui récupère un Thing spécifique
-exports.getOneThing = (req, res, next) => {
+// Requête GET qui récupère un Book spécifique
+exports.getOneBook = (req, res, next) => {
     console.log('Requête GET ONE reçue !')
-    Thing.findOne({ _id: req.params.id }) // Recherche d'un objet Thing par son ID
-        .then(thing => res.status(200).json(thing))
+    Book.findOne({ _id: req.params.id }) // Recherche d'un objet Book par son ID
+        .then(book => res.status(200).json(book))
         .catch(error => res.status(404).json({ error }))
 }
 
-// Requête POST qui enregistre les Things dans la base de données
-exports.createThing = (req, res, next) => {
+// Requête POST qui enregistre les Books dans la base de données
+exports.createBook = (req, res, next) => {
     console.log('Requête POST reçue !')
-    delete thingObjet._id // Suppression de l'ID de l'objet pour éviter les conflits
-    delete thingObjet._userId // Suppression de l'ID utilisateur pour évitier les conflits
-    const thing = new Thing({
-        ...thingObjet, // Copie des propriétés de thingObjet
+    delete bookObjet._id // Suppression de l'ID de l'objet pour éviter les conflits
+    delete bookObjet._userId // Suppression de l'ID utilisateur pour éviter les conflits
+    const book = new Book ({
+        ...bookObjet, // Copie des propriétés de bookObjet
         userId: req.auth.userId, // Ajout de l'ID utilisateur à partir de l'authentification
         imageUrl: `${req.protocol}://${req.get('host')}/images/${req.file.filename}` // Génération de l'URL de l'image
     })
-    thing.save() // Sauvegarde de l'objet dans la base de données
-        .then(() => { res.status(201).json({ message: 'Objet enregistré !'})})
+    book.save() // Sauvegarde de l'objet dans la base de données
+        .then(() => { res.status(201).json({ message: 'Book enregistré !'})})
         .catch(error => { res.status(400).json({ error })})
 }
 
-// Requête PUT pour mettre à jour un Thing existant
-exports.modifyThing = (req, res, next) => {
+// Requête PUT pour mettre à jour un Book existant
+exports.modifyBook = (req, res, next) => {
     console.log('Requête PUT reçue !')
-    const thingObjet = req.file ? {
-        ...JSON.parse(req.body.thing), // Si un fichier est présent, parse le corps de la requête
+    const bookObjet = req.file ? {
+        ...JSON.parse(req.body.book), // Si un fichier est présent, parse le corps de la requête
         imageUrl: `${req.protocol}://${req.get('host')}/images/${req.file.filename}` // Gérération de l'URL de l'image
     } : { ...req.body } // Sinon, copie simplement le corps de la requête
     
-    delete thingObjet._userId // Suppression de l'ID utilisateur pour éviter les conflits
-    Thing.findOne({_id: req.params.id}) // Recherche de l'objet Thing par son ID
-        .then((thing) => {
-            if (thing.userId != req.auth.userId) { // Vérification de l'ID utilisateur
-                res.status(401).json({ message : 'Not authorized'})
+    delete bookObjet._userId // Suppression de l'ID utilisateur pour éviter les conflits
+    Book.findOne({_id: req.params.id}) // Recherche de l'objet Book par son ID
+        .then((book) => {
+            if (book.userId != req.auth.userId) { // Vérification de l'ID utilisateur
+                res.status(401).json({ message : 'Non autorisé !'})
             } else {
-                Thing.updateOne({ _id: req.params.id }, { ...req.body, _id: req.params.id }) // Mise à jour de l'objet
-                .then(() => res.status(200).json({ message: 'Objet modifié !'}))
+                Book.updateOne({ _id: req.params.id }, { ...req.body, _id: req.params.id }) // Mise à jour de l'objet
+                .then(() => res.status(200).json({ message: 'Book modifié !'}))
                 .catch(error => res.status(400).json({ error }))
             }
         })
@@ -62,18 +62,18 @@ exports.modifyThing = (req, res, next) => {
         })
     }        
 
-// Requête DELETE pour supprimer un Thing
-exports.deleteThing = (req, res, next) => {
+// Requête DELETE pour supprimer un Book
+exports.deleteBook = (req, res, next) => {
     console.log('Requête DELETE reçue !')
-    Thing.findOne({ _id: req.params.id}) // Recherche de l'objet Thing par son ID
-        .then(thing => {
-            if (thing.userId != req.auth.userId) { // Vérification de l'ID utilisateur
-                res.status(401).json({message: 'Not Authorized'})
+    Book.findOne({ _id: req.params.id}) // Recherche de l'objet Book par son ID
+        .then(book => {
+            if (book.userId != req.auth.userId) { // Vérification de l'ID utilisateur
+                res.status(401).json({message: 'Non autorisé !'})
             } else {
-                const filename = thing.imageUrl.split('/images/')[1] // Extraction du nom de fichier de l'URL de l'image
+                const filename = book.imageUrl.split('/images/')[1] // Extraction du nom de fichier de l'URL de l'image
                 fs.unlink(`images/${filename}`, () => { // Suppression du fichier image
-                    Thing.deleteOne({ _id: req.params.id }) // Suppression de l'objet de la base de données
-                    .then(() => res.status(200).json({ message: 'Objet supprimé !'}))
+                    Book.deleteOne({ _id: req.params.id }) // Suppression de l'objet Book de la base de données
+                    .then(() => res.status(200).json({ message: 'Book supprimé !'}))
                     .catch(error => res.status(400).json({ error }))            
                 })
             }   
