@@ -1,0 +1,30 @@
+INSTALLATION DES DEPENDANCES POUR LE FRONT-END ET LE BACK-END : 
+npm Install
+
+VERIFICATION DES MISES A JOUR DISPONIBLES POUR LES PACKAGES INSTALLÉS :
+npm outdated
+
+METTRE A JOUR TOUS LES PACKAGES :
+npx npm-check-updates -u 
+Puis npm install 
+
+
+
+-- FRONT-END -- 
+
+
+
+
+
+
+
+
+
+-- BACK-END --
+Lancement du serveur : 
+nodemon server
+
+Dans le fichier app.js : 
+Entrer l'URL MongoDB pour connecter l'API au serveur. 
+
+Penser à modifier le "RANDOM_TOKEN_SECRET" par une chaîne de caractère aléatoire avant la production. 
