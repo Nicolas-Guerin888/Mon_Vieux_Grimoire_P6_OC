@@ -20,22 +20,27 @@ exports.getOneBook = (req, res, next) => {
     console.log('Requête GET ONE reçue !')
     Book.findOne({ _id: req.params.id }) // Recherche d'un objet Book par son ID
         .then(book => res.status(200).json(book))
-        .catch(error => res.status(404).json({ error }))
-}
+        .catch(error => {
+            console.log(error)
+            res.status(404).json({ error })
+})}
 
 // Requête POST qui enregistre les Books dans la base de données
 exports.createBook = (req, res, next) => {
     console.log('Requête POST reçue !')
-    delete bookObjet._id // Suppression de l'ID de l'objet pour éviter les conflits
-    delete bookObjet._userId // Suppression de l'ID utilisateur pour éviter les conflits
+    const bookObject = JSON.parse(req.body.book) // Parser la chaine JSON
+    delete bookObject._id // Suppression de l'ID de l'objet pour éviter les conflits
+    delete bookObject._userId // Suppression de l'ID utilisateur pour éviter les conflits
     const book = new Book ({
-        ...bookObjet, // Copie des propriétés de bookObjet
+        ...bookObject, // Copie des propriétés de bookObjet
         userId: req.auth.userId, // Ajout de l'ID utilisateur à partir de l'authentification
         imageUrl: `${req.protocol}://${req.get('host')}/images/${req.file.filename}` // Génération de l'URL de l'image
     })
     book.save() // Sauvegarde de l'objet dans la base de données
         .then(() => { res.status(201).json({ message: 'Book enregistré !'})})
-        .catch(error => { res.status(400).json({ error })})
+        .catch(error => {
+            console.log(error)
+            res.status(400).json({ error })})
 }
 
 // Requête PUT pour mettre à jour un Book existant
