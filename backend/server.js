@@ -1,5 +1,6 @@
 const http = require('http') // Importation du package HTTP de Node.js
 const app = require('./app') // Importation de l'application Express
+require('dotenv').config()
 
 // Cette fonction renvoie un port valide, qu'il soit fourni sous la forme d'un numéro ou d'une chaîne
 const normalizePort = val => {

@@ -1,4 +1,4 @@
-const mongoose = require('mongoose');
+const mongoose = require('mongoose')
 
 // Définition du schéma pour les objets "Book"
 const bookSchema = mongoose.Schema({
@@ -18,4 +18,4 @@ const bookSchema = mongoose.Schema({
 })
 
 // Exportation du modèle "Book" basé sur le schéma
-module.exports = mongoose.model('Book', bookSchema);
+module.exports = mongoose.model('Book', bookSchema)

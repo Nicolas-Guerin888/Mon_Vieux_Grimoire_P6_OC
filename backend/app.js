@@ -1,6 +1,6 @@
 const express = require('express') // Importation de l'appli Express
 const mongoose = require('mongoose') // Importation de Mongoose pour interagir avec MongoDB
-const stuffRoutes = require('./routes/stuff') // Importation des routes pour les objets "stuff"
+const stuffRoutes = require('./routes/book') // Importation des routes pour les objets "book"
 const userRoutes = require('./routes/user') // Importation des routes pour les utilisateurs
 const path = require('path') // Importation du module path pour gérer les chemins de fichiers
 
