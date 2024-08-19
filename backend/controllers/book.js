@@ -6,7 +6,6 @@ const id = new mongoose.Types.ObjectId();
 console.log(id); // Cela générera un nouvel ObjectId */
 
 
-
 // Requête GET qui récupère toute la liste de Books
 exports.getAllBooks = (req, res, next) => {
     console.log('Requête GET ALL reçue !')
@@ -27,8 +26,9 @@ exports.getOneBook = (req, res, next) => {
 
 // Requête POST qui enregistre les Books dans la base de données
 exports.createBook = (req, res, next) => {
-    console.log('Requête POST reçue !')
+    console.log('Requête POST Book reçue !')
     const bookObject = JSON.parse(req.body.book) // Parser la chaine JSON
+    console.log(req.body.book)
     delete bookObject._id // Suppression de l'ID de l'objet pour éviter les conflits
     delete bookObject._userId // Suppression de l'ID utilisateur pour éviter les conflits
     const book = new Book ({
@@ -43,29 +43,65 @@ exports.createBook = (req, res, next) => {
             res.status(400).json({ error })})
 }
 
+exports.createRating = (req, res, next) => {
+    console.log('Requête POST Rating reçue !')
+    const { userId, grade } = req.body
+    Book.findOne({ _id: req.params.id }) // Recherche d'un Book par son ID
+        .then(book => {
+            if(!book) {
+                return res.status(404).json({ message: 'Livre non trouvé !' })
+            }
+            const existingRating = book.rating.find(r => r.userId === userId) // Vérification si l'utilisateur a déjà noté ce livre
+            if (existingRating) {
+                return res.status(400).json({ message: 'Vous avez déjà noté ce livre !'})
+            }
+            book.rating.push({ userId, grade }) // Ajout de la nouvelle note
+            const totalRatings = book.rating.length // Calcul de la nouvelle note moyenne
+            const sumRatings = book.rating.reduce((sum, r) => sum + r.grade, 0)
+            book.averageRating = sumRatings / totalRatings
+
+            book.save()
+                .then(() => res.status(201).json({ message: 'Note ajoutée avec succès !'}))
+                .catch(error => res.status(400).json({ error }))
+        })
+        .catch(error => res.status(400).json({ error }))
+}
+
 // Requête PUT pour mettre à jour un Book existant
 exports.modifyBook = (req, res, next) => {
-    console.log('Requête PUT reçue !')
-    const bookObjet = req.file ? {
-        ...JSON.parse(req.body.book), // Si un fichier est présent, parse le corps de la requête
-        imageUrl: `${req.protocol}://${req.get('host')}/images/${req.file.filename}` // Gérération de l'URL de l'image
-    } : { ...req.body } // Sinon, copie simplement le corps de la requête
+    console.log('Requête PUT reçue !');
     
-    delete bookObjet._userId // Suppression de l'ID utilisateur pour éviter les conflits
-    Book.findOne({_id: req.params.id}) // Recherche de l'objet Book par son ID
+    // Créer l'objet de mise à jour avec ou sans nouvelle image
+    const bookObjet = req.file ? {
+        ...JSON.parse(req.body.book),
+        imageUrl: `${req.protocol}://${req.get('host')}/images/${req.file.filename}`
+    } : { ...req.body };
+
+    delete bookObjet._userId; // Suppression de l'ID utilisateur pour éviter les conflits
+
+    // Trouver le livre à modifier
+    Book.findOne({_id: req.params.id})
         .then((book) => {
             if (book.userId != req.auth.userId) { // Vérification de l'ID utilisateur
-                res.status(401).json({ message : 'Non autorisé !'})
+                res.status(401).json({ message: 'Non autorisé !' })
             } else {
-                Book.updateOne({ _id: req.params.id }, { ...req.body, _id: req.params.id }) // Mise à jour de l'objet
-                .then(() => res.status(200).json({ message: 'Book modifié !'}))
-                .catch(error => res.status(400).json({ error }))
+                if (req.file) { // Si une nouvelle image est fournie
+                    const oldFilename = book.imageUrl.split('/images/')[1] // Récupérer le nom de l'ancienne image
+                    fs.unlink(`images/${oldFilename}`, (err) => { // Supprimer l'ancienne image
+                        if (err) console.log(err)
+                    })
+                }
+                
+                // Mettre à jour le livre avec les nouvelles données
+                Book.updateOne({ _id: req.params.id }, { ...bookObjet, _id: req.params.id })
+                    .then(() => res.status(200).json({ message: 'Book modifié !' }))
+                    .catch(error => res.status(400).json({ error }))
             }
         })
-        .catch ((error) => { 
+        .catch((error) => {
             res.status(400).json({ error })
         })
-    }        
+}
 
 // Requête DELETE pour supprimer un Book
 exports.deleteBook = (req, res, next) => {

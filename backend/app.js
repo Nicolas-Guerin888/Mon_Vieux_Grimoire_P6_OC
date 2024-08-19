@@ -1,6 +1,6 @@
 const express = require('express') // Importation de l'appli Express
 const mongoose = require('mongoose') // Importation de Mongoose pour interagir avec MongoDB
-const stuffRoutes = require('./routes/book') // Importation des routes pour les objets "book"
+const bookRoutes = require('./routes/book') // Importation des routes pour les objets "book"
 const userRoutes = require('./routes/user') // Importation des routes pour les utilisateurs
 const path = require('path') // Importation du module path pour gérer les chemins de fichiers
 
@@ -25,7 +25,7 @@ app.use(express.json())
 app.use(express.urlencoded({ extended: true }))
 
 // Définition des routes
-app.use('/api/books', stuffRoutes) // Utilise les routes définies dans stuffRoutes pour les requêtes vers /api/stuff
+app.use('/api/books', bookRoutes) // Utilise les routes définies dans bookRoutes pour les requêtes vers /api/books
 app.use('/api/auth', userRoutes) // Utilise les routes définies dans userRoutes pour les requêtes vers /api/auth
 
 // Gestion des fichiers statiques
