@@ -3,13 +3,15 @@ const mongoose = require('mongoose') // Importation de Mongoose pour interagir a
 const bookRoutes = require('./routes/book') // Importation des routes pour les objets "book"
 const userRoutes = require('./routes/user') // Importation des routes pour les utilisateurs
 const path = require('path') // Importation du module path pour gérer les chemins de fichiers
+require('dotenv').config()
+
 
 // Création de l'application Express
 const app = express()
 
 
 // Connexion à MongoDB
-mongoose.connect('mongodb+srv://NicolasAdminTest:kmxpSg8KaR9FYD2G@cluster0.takpkux.mongodb.net/?retryWrites=true&w=majority&appName=Cluster0') // URL MongoDB
+mongoose.connect(process.env.MONGODB_PASSWORD) // URL MongoDB
     .then(() => console.log('Connexion à MongoDB réussie !')) // Message de succès si la connexion fonctionne
     .catch(() => console.log('Connexion à MongoDB échouée !')) // Message d'erreur si la connexion échoue
 

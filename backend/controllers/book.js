@@ -24,6 +24,15 @@ exports.getOneBook = (req, res, next) => {
             res.status(404).json({ error })
 })}
 
+// Requête GET qui récupère un tableau des 3 livres ayant la meilleur note moyenne
+exports.getBestRating = (req, res, next) => {
+    console.log('Requête GET Best Rating reçue !')
+
+    Book.find().sort({ averageRating: -1}).limit(3)
+        .then(books => res.status(200).json(books))
+        .catch(error => res.status(400).json({ error }))
+}
+
 // Requête POST qui enregistre les Books dans la base de données
 exports.createBook = (req, res, next) => {
     console.log('Requête POST Book reçue !')
