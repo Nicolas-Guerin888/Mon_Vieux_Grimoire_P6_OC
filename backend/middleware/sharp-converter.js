@@ -3,9 +3,6 @@ const fs = require('fs');
 const path = require('path');
 
 const convertToWebp = (req, res, next) => {
-    if (!req.file) {
-        return next(); // Si aucun fichier n'est téléchargé, passer au middleware suivant
-    }
 
     const inputFilePath = path.join(__dirname, '..', 'images', req.file.filename); // Chemin complet de l'image originale
     const outputFilePath = inputFilePath.replace(/\.[^/.]+$/, ".webp"); // Remplace l'extension par .webp
@@ -24,6 +21,7 @@ const convertToWebp = (req, res, next) => {
     // Conversion de l'image en WebP
     sharp(inputFilePath)
         .webp({ quality: 80 }) // Qualité de l'image WebP (0-100)
+        .resize (463, 595) // Redimensionne l'image en 463x595px
         .toFile(outputFilePath)
         .then(() => {
             // Suppression de l'image d'origine
