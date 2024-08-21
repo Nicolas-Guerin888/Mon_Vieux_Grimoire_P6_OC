@@ -1,4 +1,6 @@
 const jwt = require('jsonwebtoken') // Importation du module jsonwebtoken pour la gestion des tokens
+require('dotenv').config()
+
 
 module.exports = (req, res, next) => {
     try {

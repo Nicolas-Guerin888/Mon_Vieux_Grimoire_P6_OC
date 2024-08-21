@@ -54,26 +54,55 @@ exports.createBook = (req, res, next) => {
 
 exports.createRating = (req, res, next) => {
     console.log('Requête POST Rating reçue !')
-    const { userId, grade } = req.body
-    Book.findOne({ _id: req.params.id }) // Recherche d'un Book par son ID
+    console.log('ID du livre :', req.params.id)
+    console.log('Corps de la requête :', req.body)
+
+    const { userId, rating } = req.body
+    if (!userId || rating == null) {
+        console.log('userId ou rating manquant !');
+        return res.status(400).json({ message: 'userId et rating sont requis !' })
+    }
+
+    Book.findOne({ _id: req.params.id })
         .then(book => {
-            if(!book) {
+            console.log('Rating :', rating)
+            console.log('Livre trouvé :', book)
+            if (!book) {
                 return res.status(404).json({ message: 'Livre non trouvé !' })
             }
-            const existingRating = book.rating.find(r => r.userId === userId) // Vérification si l'utilisateur a déjà noté ce livre
-            if (existingRating) {
-                return res.status(400).json({ message: 'Vous avez déjà noté ce livre !'})
-            }
-            book.rating.push({ userId, grade }) // Ajout de la nouvelle note
-            const totalRatings = book.rating.length // Calcul de la nouvelle note moyenne
-            const sumRatings = book.rating.reduce((sum, r) => sum + r.grade, 0)
-            book.averageRating = sumRatings / totalRatings
 
+            // Vérifiez si l'utilisateur a déjà noté ce livre
+            const existingRating = book.ratings.find(r => r.userId === userId)
+            if (existingRating) {
+                return res.status(400).json({ message: 'Vous avez déjà noté ce livre !' })
+            }
+
+            // Ajouter la nouvelle note
+            book.ratings.push({ userId, rating })
+            const totalRatings = book.ratings.length
+
+            // Calculer la nouvelle somme des notes
+            const existingSumRatings = book.averageRating * (totalRatings - 1)
+            const sumRatings = existingSumRatings + rating // Ajouter la nouvelle note à la somme
+
+            // Calculer la nouvelle moyenne
+            book.averageRating = sumRatings / totalRatings          
+            console.log('Total ratings:',totalRatings)
+            console.log('Sum Ratings :', sumRatings)
+            console.log('Book Average :', book.averageRating)
+
+            // Sauvegarder les modifications
             book.save()
-                .then(() => res.status(201).json({ message: 'Note ajoutée avec succès !'}))
-                .catch(error => res.status(400).json({ error }))
+                .then(() => res.status(201).json({ message: 'Note ajoutée avec succès !' }))
+                .catch(error => {
+                    console.error('Erreur lors de l\'enregistrement de la note :', error)
+                    res.status(400).json({ error })
+                });
         })
-        .catch(error => res.status(400).json({ error }))
+        .catch(error => {
+            console.error('Erreur lors de la recherche du livre :', error)
+            res.status(400).json({ error })
+        })
 }
 
 // Requête PUT pour mettre à jour un Book existant

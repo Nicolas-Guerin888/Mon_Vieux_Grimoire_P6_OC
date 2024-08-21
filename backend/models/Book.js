@@ -11,7 +11,7 @@ const bookSchema = mongoose.Schema({
     ratings : [
         {
             userId: { type:String, required: true},
-            grade: {type: Number, required: true} // Note donnée à un livre
+            rating: {type: Number, required: true} // Note donnée à un livre
         }
     ],
     averageRating: { type: Number } // Note moyenne du livre

@@ -1,5 +1,4 @@
 const sharp = require('sharp');
-const fs = require('fs');
 const path = require('path');
 
 const convertToWebp = (req, res, next) => {
@@ -27,21 +26,14 @@ const convertToWebp = (req, res, next) => {
         .resize (463, 595) // Redimensionne l'image en 463x595px
         .toFile(outputFilePath)
         .then(() => {
-            // Suppression de l'image d'origine
-            fs.unlink(inputFilePath, (err) => {
-                if (err) {
-                    console.error('Erreur lors de la suppression de l\'image d\'origine :', err);
-                    return next(err);
-                }
-                req.file.filename = path.basename(outputFilePath); // Mise à jour du nom de fichier dans req.file
-                next(); // Passer au middleware suivant ou à la réponse
-            });
+            req.file.originalPath = inputFilePath
+            req.file.webpPath = outputFilePath // Mise à jour du nom de fichier dans req.file
+                next() // Passer au middleware suivant ou à la réponse
         })
         .catch(err => {
-            console.error('Erreur lors de la conversion en WebP :', err.message);
-            console.error('Stack trace :', err.stack);
-            next(err); // Passer l'erreur au middleware suivant
-        });
-};
+            console.error('Erreur lors de la conversion en WebP :', err.message)
+            next(err) // Passer l'erreur au middleware suivant
+        })
+}
 
 module.exports = convertToWebp;
