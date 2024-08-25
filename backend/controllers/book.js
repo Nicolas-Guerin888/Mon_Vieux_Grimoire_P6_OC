@@ -57,11 +57,7 @@ exports.createRating = (req, res, next) => {
     console.log('ID du livre :', req.params.id)
     console.log('Corps de la requête :', req.body)
 
-    const { userId, rating } = req.body
-    if (!userId || rating == null) {
-        console.log('userId ou rating manquant !');
-        return res.status(400).json({ message: 'userId et rating sont requis !' })
-    }
+    const { rating } = req.body
 
     Book.findOne({ _id: req.params.id })
         .then(book => {
@@ -73,17 +69,21 @@ exports.createRating = (req, res, next) => {
 
             // Vérifiez si l'utilisateur a déjà noté ce livre
             const existingRating = book.ratings.find(r => r.userId === userId)
+            console.log('existingRating:', existingRating)
             if (existingRating) {
                 return res.status(400).json({ message: 'Vous avez déjà noté ce livre !' })
             }
 
             // Ajouter la nouvelle note
-            book.ratings.push({ userId, rating })
-            const totalRatings = book.ratings.length
+            const newRating = { userId: req.auth.userId, grade: rating }
+            book.ratings.push({ newRating })
 
             // Calculer la nouvelle somme des notes
-            const existingSumRatings = book.averageRating * (totalRatings - 1)
-            const sumRatings = existingSumRatings + rating // Ajouter la nouvelle note à la somme
+            const totalRatings = book.ratings.length
+            // const existingSumRatings = book.averageRating * (totalRatings - 1)
+            // const sumRatings = existingSumRatings + rating // Ajouter la nouvelle note à la somme
+            const sumRatings = book.ratings.reduce((sum, rating) => sum + rating.grade, 0)
+
 
             // Calculer la nouvelle moyenne
             book.averageRating = sumRatings / totalRatings          

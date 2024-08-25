@@ -11,10 +11,10 @@ const bookSchema = mongoose.Schema({
     ratings : [
         {
             userId: { type:String, required: true},
-            rating: {type: Number, required: true} // Note donnée à un livre
+            grade: {type: Number, required: true} // Note donnée à un livre
         }
     ],
-    averageRating: { type: Number } // Note moyenne du livre
+    averageRating: { type: Number, default: 0 } // Note moyenne du livre
 })
 
 // Exportation du modèle "Book" basé sur le schéma
