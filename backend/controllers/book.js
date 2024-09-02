@@ -45,6 +45,7 @@ exports.createBook = (req, res, next) => {
         userId: req.auth.userId, // Ajout de l'ID utilisateur à partir de l'authentification
         imageUrl: `${req.protocol}://${req.get('host')}/images/${req.file.filename}` // Génération de l'URL de l'image
     })
+    console.log(book)
     book.save() // Sauvegarde de l'objet dans la base de données
         .then(() => { res.status(201).json({ message: 'Book enregistré !'})})
         .catch(error => {
@@ -67,21 +68,13 @@ exports.createRating = (req, res, next) => {
                 return res.status(404).json({ message: 'Livre non trouvé !' })
             }
 
-            // Vérifiez si l'utilisateur a déjà noté ce livre
-            const existingRating = book.ratings.find(r => r.userId === userId)
-            console.log('existingRating:', existingRating)
-            if (existingRating) {
-                return res.status(400).json({ message: 'Vous avez déjà noté ce livre !' })
-            }
-
             // Ajouter la nouvelle note
             const newRating = { userId: req.auth.userId, grade: rating }
-            book.ratings.push({ newRating })
+            console.log(newRating)
+            book.ratings.push( newRating )
 
             // Calculer la nouvelle somme des notes
             const totalRatings = book.ratings.length
-            // const existingSumRatings = book.averageRating * (totalRatings - 1)
-            // const sumRatings = existingSumRatings + rating // Ajouter la nouvelle note à la somme
             const sumRatings = book.ratings.reduce((sum, rating) => sum + rating.grade, 0)
 
 
@@ -93,7 +86,7 @@ exports.createRating = (req, res, next) => {
 
             // Sauvegarder les modifications
             book.save()
-                .then(() => res.status(201).json({ message: 'Note ajoutée avec succès !' }))
+                .then(() => res.status(201).json( book ))
                 .catch(error => {
                     console.error('Erreur lors de l\'enregistrement de la note :', error)
                     res.status(400).json({ error })
@@ -107,7 +100,6 @@ exports.createRating = (req, res, next) => {
 
 // Requête PUT pour mettre à jour un Book existant
 exports.modifyBook = (req, res, next) => {
-    console.log('Requête PUT reçue !');
     
     // Créer l'objet de mise à jour avec ou sans nouvelle image
     const bookObjet = req.file ? {
