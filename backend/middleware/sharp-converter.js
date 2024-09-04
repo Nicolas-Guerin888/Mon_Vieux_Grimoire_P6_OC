@@ -24,7 +24,6 @@ const convertToWebp = (req, res, next) => {
             next()// Passer au middleware suivant ou à la réponse
         })
         .catch(err => {
-            console.error('Erreur lors de la conversion en WebP :', err.message)
             next(err) // Passer l'erreur au middleware suivant
         })
 }

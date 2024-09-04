@@ -17,15 +17,5 @@ const bookSchema = mongoose.Schema({
     averageRating: { type: Number, default: 0 } // Note moyenne du livre
 })
 
-// Middleware pour transformer _id en id
-/*bookSchema.set('toJSON', {
-    virtuals: true,
-    versionKey: false,
-    transform: function (doc, ret) {
-        ret.id = ret._id
-        delete ret._id
-    }
-})*/
-
 // Exportation du modèle "Book" basé sur le schéma
 module.exports = mongoose.model('Book', bookSchema)

@@ -18,7 +18,7 @@ mongoose.connect(process.env.MONGODB_PASSWORD) // URL MongoDB
 // Ce bloc de code évite les erreurs de CORS en permettant à deux serveurs différents de pouvoir communiquer.
 app.use((req, res, next) => {
     res.setHeader('Access-Control-Allow-Origin', '*') // Permet à toutes les origines d'accéder à l'API
-    res.setHeader('Access-Control-Allow-Headers', 'Origin, X-Requested-With, Content, Accept, Content-Type, Authorization') // Autorise certains en-têtes
+    res.setHeader('Access-Control-Allow-Headers', 'Origin, X-Requested-With, Content, Accept, Content-Type, Authorization') // Autorise certaines en-têtes
     res.setHeader('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE, PATCH, OPTIONS') // Autorise certaines méthodes HTTP
     next()
 })
