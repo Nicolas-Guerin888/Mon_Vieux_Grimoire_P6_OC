@@ -27,7 +27,12 @@ exports.getBestRating = (req, res, next) => {
 
 // Requête POST qui enregistre les Books dans la base de données
 exports.createBook = (req, res, next) => {
-    const bookObject = JSON.parse(req.body.book) // Parser la chaine JSON
+    let bookObject;
+    try {
+        bookObject = JSON.parse(req.body.book) // Parser la chaine JSON
+    } catch (error) {
+        return res.status(400).json({ error })
+    }
     delete bookObject._id // Suppression de l'ID de l'objet pour éviter les conflits
     delete bookObject._userId // Suppression de l'ID utilisateur pour éviter les conflits
     const book = new Book ({
@@ -43,7 +48,9 @@ exports.createBook = (req, res, next) => {
 
 exports.createRating = (req, res, next) => {
     const { rating } = req.body
-
+    if (rating < 0 || rating > 5 ) {
+        return res.status(404).json({ message: 'Le nombre rating doit être compris entre 0 et 5'})
+    }
     Book.findOne({ _id: req.params.id })
         .then(book => {
             if (!book) {
@@ -78,12 +85,17 @@ exports.createRating = (req, res, next) => {
 exports.modifyBook = (req, res, next) => {
     
     // Créer l'objet de mise à jour avec ou sans nouvelle image
-    const bookObjet = req.file ? {
+    let bookObject
+    try {
+    bookObject = req.file ? {
         ...JSON.parse(req.body.book),
         imageUrl: `${req.protocol}://${req.get('host')}/images/${req.file.filename}`
-    } : { ...req.body };
+    } : { ...req.body }
+    } catch (error) {
+        return res.status(400).json ({ error })
+    }
 
-    delete bookObjet._userId; // Suppression de l'ID utilisateur pour éviter les conflits
+    delete bookObject._userId; // Suppression de l'ID utilisateur pour éviter les conflits
 
     // Trouver le livre à modifier
     Book.findOne({_id: req.params.id})
@@ -99,7 +111,7 @@ exports.modifyBook = (req, res, next) => {
                 }
                 
                 // Mettre à jour le livre avec les nouvelles données
-                Book.updateOne({ _id: req.params.id }, { ...bookObjet, _id: req.params.id })
+                Book.updateOne({ _id: req.params.id }, { ...bookObject, _id: req.params.id })
                     .then(() => res.status(200).json({ message: 'Book modifié !' }))
                     .catch(error => res.status(400).json({ error }))
             }
