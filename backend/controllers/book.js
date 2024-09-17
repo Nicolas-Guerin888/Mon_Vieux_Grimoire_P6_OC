@@ -57,6 +57,12 @@ exports.createRating = (req, res, next) => {
                 return res.status(404).json({ message: 'Livre non trouvé !' })
             }
 
+            // Vérification si l'utilisateur a déjà noté ce livre
+            const existingRating = book.ratings.find(r => r.userId === req.auth.userId)
+            if (existingRating) {
+                return res.satus(400).json({ message: 'Vous avez déjà noté ce livre' })
+            }
+
             // Ajouter la nouvelle note
             const newRating = { userId: req.auth.userId, grade: rating }
             book.ratings.push( newRating )
@@ -66,9 +72,10 @@ exports.createRating = (req, res, next) => {
             const sumRatings = book.ratings.reduce((sum, rating) => sum + rating.grade, 0)
 
 
-            // Calculer la nouvelle moyenne
-            book.averageRating = sumRatings / totalRatings          
-
+            // Calculer la nouvelle moyenne et l'arrondir
+            book.averageRating = Math.round(sumRatings / totalRatings) 
+            
+        
             // Sauvegarder les modifications
             book.save()
                 .then(() => res.status(201).json( book ))
