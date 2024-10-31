@@ -1,6 +1,6 @@
 Site Mon Vieux Grimoire
 
-![Aperçu du site Mon Vieux Grimoire](./frontend/src/images/image-readMe.png)
+![Aperçu du site Mon Vieux Grimoire](./backend/images/image-readMe.png)
 
 Ce dépôt correspond au projet 6 de la formation Développeur Web d'OpenClassrooms. 
 
